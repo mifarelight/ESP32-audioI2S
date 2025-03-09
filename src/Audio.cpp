@@ -2474,19 +2474,20 @@ void Audio::loop() {
                     m_dataMode = HTTP_RESPONSE_HEADER;
                 }
                 else { // host == NULL means connect to m3u8 URL
-                    if(m_lastM3U8host) httpPrint(m_lastM3U8host);
-                    else               httpPrint(m_lastHost);        // if url has no first redirection
-
                     if(millis() - connect_host_time < 1000) {
                         if(++interval_short_cnt >= 5) {            // connect to host too often (maybe cause by temporary bad network quality)
                             interval_short_cnt = 0;
 
                             AUDIO_INFO("connect host interval too short, try to reconnect...");
-                            connecttohost(m_lastHost);
+                            if(m_lastM3U8host) connecttohost(m_lastM3U8host);
+                            else               connecttohost(m_lastHost);        // if url has no first redirection
                         }
                     }
                     else {
                         interval_short_cnt = 0;
+                        
+                        if(m_lastM3U8host) httpPrint(m_lastM3U8host);
+                        else               httpPrint(m_lastHost);        // if url has no first redirection
                     }
                     connect_host_time = millis();
                     
